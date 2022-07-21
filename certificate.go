@@ -131,7 +131,7 @@ func (c *Certificate) getMetadata(logger zerolog.Logger) (*CertificateMetadata, 
 		return nil, err
 	}
 
-	logger.Info().Str("cert-id", metadata.ID).Msg("Certificate metadata retreived")
+	logger.Info().Str("cert-id", metadata.ID).Msg("Certificate metadata retrieved")
 
 	metadata.Files.getAll(logger)
 
