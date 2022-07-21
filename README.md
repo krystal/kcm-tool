@@ -26,7 +26,7 @@ certificates:
 
 ## Getting started
 
-1. Download the latest release from GitHub and pop it in `/usr/bin/kcm-tool` on the server.
-2. Set the executable flag (`chmod +x /usr/bin/kcm-tool`).
+1. Download the latest release from GitHub and pop it in `/usr/local/bin/kcm-tool` on the server.
+2. Set the executable flag (`chmod +x /usr/local/bin/kcm-tool`).
 3. Add your configuration file somewhere.
 4. Run the tool (`kcm-tool --config path/to/config.yaml`).
