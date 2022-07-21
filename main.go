@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"time"
 
@@ -19,16 +18,24 @@ func main() {
 
 	config, err := NewConfigFromFile(*path)
 	if err != nil {
-		fmt.Println("Could not load configuration")
-		fmt.Printf("Error: %v", err)
+		logger.Err(err).Str("path", *path).Msg("Failed to load config")
 		os.Exit(1)
 	}
 
-	logger.Info().Msgf("Got %d certificate(s) to process", len(config.Certificates))
+	logger.Info().Int("quantity", len(config.Certificates)).Msgf("Processing certificates")
 
+	quantityUpdated := 0
 	for _, certificate := range config.Certificates {
-		certificate.Process(logger)
+		updated, err := certificate.Process(logger)
+		if err != nil {
+			logger.Err(err).Str("url", certificate.URL).Msg("Failed to process certificate")
+			continue
+		}
+
+		if updated {
+			quantityUpdated++
+		}
 	}
 
-	logger.Info().Msgf("All done!")
+	logger.Info().Int("updated", quantityUpdated).Msgf("All done")
 }

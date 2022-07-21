@@ -10,36 +10,36 @@ import (
 	"github.com/rs/zerolog"
 )
 
-func (c *Certificate) Process(logger zerolog.Logger) error {
+func (c *Certificate) Process(logger zerolog.Logger) (bool, error) {
 	logger.Info().Str("url", c.URL).Msgf("Getting certificate metadata")
 
 	metadata, err := c.getMetadata(logger)
 	if err != nil {
 		logger.Error().Str("url", c.URL).Err(err).Msg("Could not get metadata ")
-		return err
+		return false, err
 	}
 
 	requiresUpdate, err := c.requiresUpdate(metadata)
 	if err != nil {
-		return err
+		return false, err
 	}
 
 	if !requiresUpdate {
 		logger.Info().Msg("No update needed at this time")
-		return nil
+		return false, nil
 	}
 
 	err = os.WriteFile(c.Paths.Certificate, []byte(metadata.Files.Certificate), 0644)
 	if err != nil {
 		logger.Error().Err(err).Str("path", c.Paths.Certificate).Msg("Failed to write certificate file")
-		return err
+		return true, err
 	}
 	logger.Info().Str("path", c.Paths.Certificate).Msg("Certificate file saved")
 
 	err = os.WriteFile(c.Paths.PrivateKey, []byte(metadata.Files.PrivateKey), 0600)
 	if err != nil {
 		logger.Error().Err(err).Str("path", c.Paths.PrivateKey).Msg("Failed to write private key file")
-		return err
+		return true, err
 	}
 	logger.Info().Str("path", c.Paths.PrivateKey).Msg("Private key file saved")
 
@@ -49,17 +49,17 @@ func (c *Certificate) Process(logger zerolog.Logger) error {
 		err = os.WriteFile(c.Paths.Chain, []byte(metadata.Files.Chain), 0600)
 		if err != nil {
 			logger.Error().Err(err).Str("path", c.Paths.Chain).Msg("Failed to write chain file")
-			return err
+			return true, err
 		}
 		logger.Info().Str("path", c.Paths.Chain).Msg("Chain file saved")
 	}
 
 	err = c.runCommands(logger)
 	if err != nil {
-		return err
+		return true, err
 	}
 
-	return nil
+	return true, nil
 }
 
 func (c *Certificate) runCommands(logger zerolog.Logger) error {
