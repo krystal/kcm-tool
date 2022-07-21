@@ -7,11 +7,8 @@ builds:
     mod_timestamp: "{{ .CommitTimestamp }}"
     flags:
       - -trimpath
-    ldflags:
-      - "-s -w"
     goos:
       - "darwin"
-      - "freebsd"
       - "linux"
       - "windows"
     goarch:
