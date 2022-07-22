@@ -32,7 +32,7 @@ func (c *Certificate) Process(logger zerolog.Logger) (bool, error) {
 	if c.Paths.Certificate == "" {
 		logger.Info().Msg("Not saving certificate file because no path defined")
 	} else {
-		err = os.WriteFile(c.Paths.Certificate, []byte(metadata.Files.Certificate+"\n"), 0644)
+		err = os.WriteFile(c.Paths.Certificate, []byte(metadata.Files.Certificate), 0644)
 		if err != nil {
 			logger.Error().Err(err).Str("path", c.Paths.Certificate).Msg("Failed to write certificate file")
 			return true, err
@@ -43,7 +43,7 @@ func (c *Certificate) Process(logger zerolog.Logger) (bool, error) {
 	if c.Paths.PrivateKey == "" {
 		logger.Info().Msg("Not saving private key file because no path defined")
 	} else {
-		err = os.WriteFile(c.Paths.PrivateKey, []byte(metadata.Files.PrivateKey+"\n"), 0600)
+		err = os.WriteFile(c.Paths.PrivateKey, []byte(metadata.Files.PrivateKey), 0600)
 		if err != nil {
 			logger.Error().Err(err).Str("path", c.Paths.PrivateKey).Msg("Failed to write private key file")
 			return true, err
@@ -57,7 +57,7 @@ func (c *Certificate) Process(logger zerolog.Logger) (bool, error) {
 		if metadata.Files.Chain == "" {
 			logger.Info().Msg("No chain file provided")
 		} else {
-			err = os.WriteFile(c.Paths.Chain, []byte(metadata.Files.Chain+"\n"), 0600)
+			err = os.WriteFile(c.Paths.Chain, []byte(metadata.Files.Chain), 0600)
 			if err != nil {
 				logger.Error().Err(err).Str("path", c.Paths.Chain).Msg("Failed to write chain file")
 				return true, err
@@ -69,7 +69,7 @@ func (c *Certificate) Process(logger zerolog.Logger) (bool, error) {
 	if c.Paths.CertificateWithChain == "" {
 		logger.Info().Msg("Not saving certificate with chain file because no path defined")
 	} else {
-		err = os.WriteFile(c.Paths.CertificateWithChain, []byte(metadata.Files.CertificateWithChain()+"\n"), 0600)
+		err = os.WriteFile(c.Paths.CertificateWithChain, []byte(metadata.Files.CertificateWithChain()), 0600)
 		if err != nil {
 			logger.Error().Err(err).Str("path", c.Paths.CertificateWithChain).Msg("Failed to write certificate with chain file")
 			return true, err

@@ -49,7 +49,7 @@ func (cmu *CertificateMetadataFiles) CertificateWithChain() string {
 		return cmu.Certificate
 	}
 
-	return cmu.Certificate + "\n" + cmu.Chain
+	return cmu.Certificate + "\n" + cmu.Chain + "\n"
 }
 
 // getCertificate downloads the certificate data
@@ -59,7 +59,7 @@ func (cmu *CertificateMetadataFiles) getCertificate(logger zerolog.Logger) error
 	if err != nil {
 		return err
 	}
-	cmu.Certificate = strings.TrimSpace(string(body))
+	cmu.Certificate = strings.TrimSpace(string(body)) + "\n"
 	return nil
 }
 
@@ -71,7 +71,7 @@ func (cmu *CertificateMetadataFiles) getPrivateKey(logger zerolog.Logger) error 
 		return err
 	}
 
-	cmu.PrivateKey = strings.TrimSpace(string(body))
+	cmu.PrivateKey = strings.TrimSpace(string(body)) + "\n"
 	return nil
 }
 
@@ -83,6 +83,6 @@ func (cmu *CertificateMetadataFiles) getChain(logger zerolog.Logger) error {
 		return err
 	}
 
-	cmu.Chain = strings.TrimSpace(string(body))
+	cmu.Chain = strings.TrimSpace(string(body)) + "\n"
 	return nil
 }
