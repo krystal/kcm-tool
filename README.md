@@ -15,6 +15,7 @@ certificates:
       certificate: /etc/certs/service.cert.pem
       private_key: /etc/certs/service.key.pem
       chain: /etc/certs/service.chain.pem
+      certificate_with_chain: /etc/certs/service.cert-with-chain.pem
     commands:
       - systemctl reload apache2
       - touch /etc/certs/service.cert.updated

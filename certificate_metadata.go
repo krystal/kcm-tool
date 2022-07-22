@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strings"
 	"time"
 
 	"github.com/rs/zerolog"
@@ -43,6 +44,14 @@ func (cmu *CertificateMetadataFiles) getAll(logger zerolog.Logger) error {
 	return nil
 }
 
+func (cmu *CertificateMetadataFiles) CertificateWithChain() string {
+	if cmu.Chain == "" {
+		return cmu.Certificate
+	}
+
+	return cmu.Certificate + "\n" + cmu.Chain
+}
+
 // getCertificate downloads the certificate data
 func (cmu *CertificateMetadataFiles) getCertificate(logger zerolog.Logger) error {
 	logger.Debug().Str("url", cmu.CertificateURL).Msg("Getting certificate from API")
@@ -50,7 +59,7 @@ func (cmu *CertificateMetadataFiles) getCertificate(logger zerolog.Logger) error
 	if err != nil {
 		return err
 	}
-	cmu.Certificate = string(body)
+	cmu.Certificate = strings.TrimSpace(string(body))
 	return nil
 }
 
@@ -62,7 +71,7 @@ func (cmu *CertificateMetadataFiles) getPrivateKey(logger zerolog.Logger) error 
 		return err
 	}
 
-	cmu.PrivateKey = string(body)
+	cmu.PrivateKey = strings.TrimSpace(string(body))
 	return nil
 }
 
@@ -74,6 +83,6 @@ func (cmu *CertificateMetadataFiles) getChain(logger zerolog.Logger) error {
 		return err
 	}
 
-	cmu.Chain = string(body)
+	cmu.Chain = strings.TrimSpace(string(body))
 	return nil
 }

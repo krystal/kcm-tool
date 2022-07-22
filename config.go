@@ -12,15 +12,16 @@ type Config struct {
 
 type Certificate struct {
 	URL   string `yaml:"url"`
-	Paths *Paths `yaml:"paths"`
+	Paths Paths  `yaml:"paths"`
 
 	Commands []string `yaml:"commands"`
 }
 
 type Paths struct {
-	PrivateKey  string `yaml:"private_key"`
-	Certificate string `yaml:"certificate"`
-	Chain       string `yaml:"chain"`
+	PrivateKey           string `yaml:"private_key"`
+	Certificate          string `yaml:"certificate"`
+	Chain                string `yaml:"chain"`
+	CertificateWithChain string `yaml:"certificate_with_chain"`
 }
 
 func NewConfigFromFile(path string) (*Config, error) {
