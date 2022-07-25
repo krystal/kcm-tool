@@ -16,6 +16,9 @@ certificates:
       private_key: /etc/certs/service.key.pem
       chain: /etc/certs/service.chain.pem
       certificate_with_chain: /etc/certs/service.cert-with-chain.pem
+    permissions:
+      certificates: 644
+      keys: 600
     commands:
       - systemctl reload apache2
       - touch /etc/certs/service.cert.updated

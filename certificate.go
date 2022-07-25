@@ -32,23 +32,35 @@ func (c *Certificate) Process(logger zerolog.Logger) (bool, error) {
 	if c.Paths.Certificate == "" {
 		logger.Info().Msg("Not saving certificate file because no path defined")
 	} else {
-		err = os.WriteFile(c.Paths.Certificate, []byte(metadata.Files.Certificate), 0644)
+		err = os.WriteFile(c.Paths.Certificate, []byte(metadata.Files.Certificate), c.Permissions.CertificatesFileMode())
 		if err != nil {
 			logger.Error().Err(err).Str("path", c.Paths.Certificate).Msg("Failed to write certificate file")
 			return true, err
 		}
 		logger.Info().Str("path", c.Paths.Certificate).Msg("Certificate file saved")
+
+		err = os.Chmod(c.Paths.Certificate, c.Permissions.CertificatesFileMode())
+		if err != nil {
+			logger.Error().Err(err).Str("path", c.Paths.Certificate).Msg("Failed to set permissions for certificate file")
+			return true, err
+		}
 	}
 
 	if c.Paths.PrivateKey == "" {
 		logger.Info().Msg("Not saving private key file because no path defined")
 	} else {
-		err = os.WriteFile(c.Paths.PrivateKey, []byte(metadata.Files.PrivateKey), 0600)
+		err = os.WriteFile(c.Paths.PrivateKey, []byte(metadata.Files.PrivateKey), c.Permissions.KeysFileMode())
 		if err != nil {
 			logger.Error().Err(err).Str("path", c.Paths.PrivateKey).Msg("Failed to write private key file")
 			return true, err
 		}
 		logger.Info().Str("path", c.Paths.PrivateKey).Msg("Private key file saved")
+
+		err = os.Chmod(c.Paths.PrivateKey, c.Permissions.KeysFileMode())
+		if err != nil {
+			logger.Error().Err(err).Str("path", c.Paths.PrivateKey).Msg("Failed to set permissions for private key file")
+			return true, err
+		}
 	}
 
 	if c.Paths.Chain == "" {
@@ -57,24 +69,36 @@ func (c *Certificate) Process(logger zerolog.Logger) (bool, error) {
 		if metadata.Files.Chain == "" {
 			logger.Info().Msg("No chain file provided")
 		} else {
-			err = os.WriteFile(c.Paths.Chain, []byte(metadata.Files.Chain), 0600)
+			err = os.WriteFile(c.Paths.Chain, []byte(metadata.Files.Chain), c.Permissions.CertificatesFileMode())
 			if err != nil {
 				logger.Error().Err(err).Str("path", c.Paths.Chain).Msg("Failed to write chain file")
 				return true, err
 			}
 			logger.Info().Str("path", c.Paths.Chain).Msg("Chain file saved")
+
+			err = os.Chmod(c.Paths.Chain, c.Permissions.CertificatesFileMode())
+			if err != nil {
+				logger.Error().Err(err).Str("path", c.Paths.Chain).Msg("Failed to set permissions for chain file")
+				return true, err
+			}
 		}
 	}
 
 	if c.Paths.CertificateWithChain == "" {
 		logger.Info().Msg("Not saving certificate with chain file because no path defined")
 	} else {
-		err = os.WriteFile(c.Paths.CertificateWithChain, []byte(metadata.Files.CertificateWithChain()), 0600)
+		err = os.WriteFile(c.Paths.CertificateWithChain, []byte(metadata.Files.CertificateWithChain()), c.Permissions.CertificatesFileMode())
 		if err != nil {
 			logger.Error().Err(err).Str("path", c.Paths.CertificateWithChain).Msg("Failed to write certificate with chain file")
 			return true, err
 		}
 		logger.Info().Str("path", c.Paths.PrivateKey).Msg("Certificate with chain file saved")
+
+		err = os.Chmod(c.Paths.CertificateWithChain, c.Permissions.CertificatesFileMode())
+		if err != nil {
+			logger.Error().Err(err).Str("path", c.Paths.CertificateWithChain).Msg("Failed to set permissions for certificate with chain file")
+			return true, err
+		}
 	}
 
 	err = c.runCommands(logger)

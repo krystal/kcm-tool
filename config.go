@@ -1,7 +1,9 @@
 package main
 
 import (
+	"io/fs"
 	"io/ioutil"
+	"strconv"
 
 	"gopkg.in/yaml.v3"
 )
@@ -11,10 +13,10 @@ type Config struct {
 }
 
 type Certificate struct {
-	URL   string `yaml:"url"`
-	Paths Paths  `yaml:"paths"`
-
-	Commands []string `yaml:"commands"`
+	URL         string      `yaml:"url"`
+	Paths       Paths       `yaml:"paths"`
+	Permissions Permissions `yaml:"permissions"`
+	Commands    []string    `yaml:"commands"`
 }
 
 type Paths struct {
@@ -22,6 +24,31 @@ type Paths struct {
 	Certificate          string `yaml:"certificate"`
 	Chain                string `yaml:"chain"`
 	CertificateWithChain string `yaml:"certificate_with_chain"`
+}
+
+type Permissions struct {
+	Certificates int64 `yaml:"certificates"`
+	Keys         int64 `yaml:"keys"`
+}
+
+func (p Permissions) CertificatesFileMode() fs.FileMode {
+	if p.Certificates == 0 {
+		return fs.FileMode(0644)
+	}
+
+	i := strconv.FormatInt(p.Certificates, 10)
+	fm, _ := strconv.ParseInt(i, 8, 32)
+	return fs.FileMode(fm)
+}
+
+func (p Permissions) KeysFileMode() fs.FileMode {
+	if p.Keys == 0 {
+		return fs.FileMode(0600)
+	}
+
+	i := strconv.FormatInt(p.Keys, 10)
+	fm, _ := strconv.ParseInt(i, 8, 32)
+	return fs.FileMode(fm)
 }
 
 func NewConfigFromFile(path string) (*Config, error) {
