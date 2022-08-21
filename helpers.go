@@ -1,10 +1,17 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
+	"log"
 	"net/http"
 	"os"
+	"path/filepath"
+)
+
+var (
+	errUnexpectedStatusCode = fmt.Errorf("unexpected status code")
 )
 
 func fileMissing(path string) (bool, error) {
@@ -12,10 +19,12 @@ func fileMissing(path string) (bool, error) {
 	if err == nil {
 		return false, nil
 	}
+
 	if os.IsNotExist(err) {
 		return true, nil
 	}
-	return false, err
+
+	return false, fmt.Errorf("error finding file %s: %w", path, err)
 }
 
 func fileMatches(path string, otherContent string) (bool, error) {
@@ -36,33 +45,44 @@ func fileMatches(path string, otherContent string) (bool, error) {
 		return false, nil
 	}
 
-	content, err := ioutil.ReadFile(path)
+	content, err := os.ReadFile(filepath.Clean(path))
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("error reading file %s: %w", path, err)
 	}
 
 	// If the actual content of the file does not match...
 	return string(content) == otherContent, nil
 }
 
-func getURLContents(url string) (string, error) {
-	resp, err := http.Get(url)
+func getURLContents(ctx context.Context, url string) (string, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to create request: %w", err)
 	}
-	defer resp.Body.Close()
 
-	if resp.StatusCode == 404 {
+	// The DefaultClient is used here but should be replaced with a custom client.
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("failed to get URL contents: %w", err)
+	}
+
+	defer func() {
+		if bodyCloseErr := resp.Body.Close(); bodyCloseErr != nil {
+			log.Println("error closing response body:", bodyCloseErr)
+		}
+	}()
+
+	if resp.StatusCode == http.StatusNotFound {
 		return "", nil
 	}
 
-	if resp.StatusCode != 200 {
-		return "", fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("%w: %d", errUnexpectedStatusCode, resp.StatusCode)
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("error reading response body of %s: %w", url, err)
 	}
 
 	return string(body), err
