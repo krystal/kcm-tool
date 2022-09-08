@@ -1,3 +1,4 @@
+// Package main contains the kcm-tool
 package main
 
 import (
